@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/multicoral_value.dir/main.c.o  -o multicoral_value 
