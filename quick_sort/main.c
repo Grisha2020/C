@@ -3,7 +3,15 @@
 #include <assert.h>
 #include <string.h>
 
-int cmp(const void* elem1, const void* elem2){
+double double_cmp_asc(const void* elem1, const void* elem2){
+    return (*(double*)elem1 - *(double*)elem2);
+}
+
+double double_cmp_desc(const void* elem1, const void* elem2){
+    return (*(double*)elem2 - *(double*)elem1);
+}
+
+int int_cmp_asc(const void* elem1, const void* elem2){
     return (*(int*)elem1 - *(int*)elem2);
 }
 
@@ -17,100 +25,105 @@ int print_arr(double arr[], int start, int end){
     return 0;
 }
 
-int swap(double arr[], int elem1, int elem2){
-    void* swapp = malloc(sizeof(arr[elem1]));
-    memcpy(swapp, arr + elem1, sizeof(arr[elem1]));
-    memcpy(arr + elem1, arr + elem2, sizeof(arr[elem1]));
-    memcpy(arr + elem2, swapp, sizeof(arr[elem1]));
+int swap(void* elem1, void* elem2, size_t size) {
+    void *swapp = malloc(size);
+    memcpy(swapp, elem1, size);
+    memcpy(elem1, elem2, size);
+    memcpy(elem2, swapp, size);
     free(swapp);
     return 0;
+}
 
-
-int quick_sort_recurs(double arr[], int smaller, int bigger, int comp) {
-    if (bigger - smaller > 1) {
-        double centre = arr[(smaller + bigger + 1) / 2];
-        int start = smaller;
-        int end = bigger;
-        while (smaller < bigger) {
-            if (arr[smaller] >= centre && arr[bigger] > centre) {
-                while (arr[bigger] > centre) {
-                    bigger--;
-                    if (smaller >= bigger) {
+int quick_sort_recurs(void *left, void *right, size_t size, double (*cmp)(void*, void*)) {//Перед (*cmp) надо ставить
+    // тип такой же как у элементов массива, и следовательно компаратор подбирать этого же типа
+    if (right - left > size) {
+        void* centre;
+        if ((right - left) / size % 2 == 0){
+            centre = left + (right - left) / 2;
+        } else{
+            centre = left + (right - left + size) / 2;
+        }
+        void* start = left;
+        void* end = right;
+        while (left < right) {
+            if (cmp(left, centre) >= 0 && cmp(right, centre) > 0) {
+                while (cmp(right, centre) > 0) {
+                    right -= size;
+                    if (left >= right) {
                         break;
                     }
                 }
-            } else if (arr[smaller] < centre && arr[bigger] < centre) {
-                while (arr[smaller] < centre) {
-                    smaller++;
-                    if (smaller >= bigger) {
+            } else if (cmp(left, centre) < 0 && cmp(right, centre) < 0) {
+                while (cmp(left, centre) < 0) {
+                    left += size;
+                    if (left >= right) {
                         break;
                     }
                 }
-            } else if (arr[smaller] < centre && arr[bigger] >= centre){
-                smaller++;
-                bigger--;
+            } else if (cmp(left, centre) < 0 && cmp(right, centre) >= 0){
+                left += size;
+                right -= size;
                 continue;
             }
-            if (smaller >= bigger){
+            if (left >= right){
                 break;
             }
-            swap(arr, smaller, bigger);
-            smaller++;
-            bigger--;
-            if (smaller > bigger){
-                smaller--;
-                bigger++;
+            swap(left, right, size);
+            left += size;
+            right -= size;
+            if (left > right){
+                left -= size;
+                right += size;
                 break;
             }
         }
-        quick_sort_recurs(arr, start, smaller, comp);
-        quick_sort_recurs(arr, bigger, end, comp);
-    } else if (bigger - smaller == 1){
-        if (arr[smaller] > arr[bigger]){
-            swap(arr, smaller, bigger);
+        quick_sort_recurs(start, left, size,  cmp);
+        quick_sort_recurs(right, end, size, cmp);
+    } else if (right - left == size){
+        if (cmp(left, right) > 0){
+            swap(left, right, size);
         }
     }
     return 0;
 }
 
-int quick_sort(double arr[], int n){
-    int small = 0, big = n - 1;
-    quick_sort_recurs(arr, small, big, cmp);
+int quick_sort(void* arr, int n, size_t size, void* cmp){
+    void *left = arr;
+    void *right = arr + (n - 1) * size;
+    quick_sort_recurs(left, right, size, cmp);
     return 0;
 }
 
 int test(){
     int n = 6;
     double arr1[6] = {5, 3, 4, 2, 1, 2};
-    quick_sort(arr1, n);
+    quick_sort(arr1, n, sizeof(double), &double_cmp_asc);
     int arr2[6] = {5, 3, 4, 2, 1, 2};
-    qsort(arr2, 6, sizeof(int), cmp);
+    qsort(arr2, 6, sizeof(int), int_cmp_asc);
     int i = 0;
     while (i<n){
-        if (arr1[i] != arr2[i]){
-            printf("%d, %d\n", (int)arr1[i], arr2[i]);
-            //assert(0);
-        }
+        if ((int)arr1[i] != arr2[i]){assert(0);}
         i++;
     }
+//    free(arr1);
+//    free(arr2);
     return 0;
 }
 
 int main() {
-    test();
+    test();// Если в функции test использовать free, то выводит: free(): invalid pointer
     int n;
     printf("Enter the number of numbers in the array.\n");
     scanf("%d", &n);
     double* arr = malloc(n * sizeof(double));
-//    double arr[1000];
     int i = 0;
     double number;
-    while (i < n){
+    while (i < n) {
         scanf("%lf", &number);
         arr[i] = number;
         i++;
     }
-    quick_sort(arr, n);
+    quick_sort(arr, n, sizeof(double), &double_cmp_asc);
     print_arr(arr, 0, n);
     return 0;
 }
