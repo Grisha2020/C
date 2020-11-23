@@ -3,17 +3,42 @@
 #include <assert.h>
 #include <string.h>
 
-double double_cmp_asc(const void *elem1, const void *elem2) {
-    return (*(double *) elem1 - *(double *) elem2);
+int double_cmp_asc(const void *elem1, const void *elem2) {
+    if (*(double *) elem1 - *(double *) elem2 > 0) {
+        return 1;
+    } else if (*(double *) elem1 - *(double *) elem2 == 0) {
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
-double double_cmp_desc(const void *elem1, const void *elem2) {
-    return (*(double *) elem2 - *(double *) elem1);
+int double_cmp_desc(const void *elem1, const void *elem2) {
+    if (*(double *) elem2 - *(double *) elem1 > 0) {
+        return 1;
+    } else if (*(double *) elem2 - *(double *) elem1 == 0) {
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 int int_cmp_asc(const void *elem1, const void *elem2) {
     return (*(int *) elem1 - *(int *) elem2);
 }
+
+int int_cmp_desc(const void *elem1, const void *elem2) {
+    return (*(int *) elem2 - *(int *) elem1);
+}
+
+//int student_cmp(){
+//
+//}
+//
+//typedef struct student{
+//    char* name;
+//    int age;
+//}
 
 void my_memcopy(void *elem_past, void *elem_copy, size_t size) {
     int i;
@@ -28,10 +53,20 @@ void my_memcopy(void *elem_past, void *elem_copy, size_t size) {
     }
 }
 
-int print_arr(int arr[], int start, int end) {
+int print_int_arr(int arr[], int start, int end) {
     int i = start;
     while (i < end) {
         printf("%d ", arr[i]);
+        i++;
+    }
+    printf("\n");
+    return 0;
+}
+
+int print_double_arr(double arr[], int start, int end) {
+    int i = start;
+    while (i < end) {
+        printf("%lf ", arr[i]);
         i++;
     }
     printf("\n");
@@ -47,8 +82,7 @@ int swap(void *elem1, void *elem2, size_t size) {
     return 0;
 }
 
-int quick_sort_recurs(void *left, void *right, size_t size, int (*cmp)(void *, void *)) {//Перед (*cmp) надо ставить
-    // тип такой же как у элементов по которым мы будем сортировать, и следовательно компаратор подбирать этого же типа
+int quick_sort_recurs(void *left, void *right, size_t size, int (*cmp)(void *, void *)) {
     if (right - left > size) {
         void *centre;
         if ((right - left) / size % 2 == 0) {
@@ -126,16 +160,16 @@ int main() {
     int n;
     printf("Enter the number of numbers in the array.\n");
     scanf("%d", &n);
-    int *arr = malloc(n * sizeof(int));
+    double *arr = malloc(n * sizeof(double));
     int i = 0;
-    int number;
+    double number;
     while (i < n) {
-        scanf("%d", &number);
+        scanf("%lf", &number);
         arr[i] = number;
         i++;
     }
-    quick_sort(arr, n, sizeof(int), &int_cmp_asc);
-    print_arr(arr, 0, n);
+    quick_sort(arr, n, sizeof(double), &double_cmp_asc);
+    print_double_arr(arr, 0, n);
     return 0;
 }
 
