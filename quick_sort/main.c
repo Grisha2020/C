@@ -31,14 +31,59 @@ int int_cmp_desc(const void *elem1, const void *elem2) {
     return (*(int *) elem2 - *(int *) elem1);
 }
 
-//int student_cmp(){
-//
-//}
-//
-//typedef struct student{
-//    char* name;
-//    int age;
-//}
+typedef struct Student {
+    char *name;
+    int age;
+} student;
+
+student create_stud(int age, char *name) {
+    student stud;
+    stud.age = age;
+    stud.name = name;
+    return stud;
+}
+
+int student_cmp_age_asc(const void *student1, const void *student2) {
+    student stud1 = *(student *) student1;
+    student stud2 = *(student *) student2;
+    return (stud1.age - stud2.age);
+}
+
+int student_cmp_age_desc(const void *student1, const void *student2) {
+    student stud1 = *(student *) student1;
+    student stud2 = *(student *) student2;
+    return (stud2.age - stud1.age);
+}
+
+int student_cmp_name_asc(const void *student1, const void *student2) {
+    student stud1 = *(student *) student1;
+    student stud2 = *(student *) student2;
+    int i = 0;
+    while (stud1.name[i] != '\0' || stud2.name[i] != '\0') {
+        if (stud1.name[i] > stud2.name[i]) {
+            return 1;
+        } else if (stud1.name[i] < stud2.name[i]) {
+            return -1;
+        }
+        i++;
+    }
+    return (stud1.age - stud2.age);//Если имя одинаковое, то сортирует по возрасту(по возрастанию)
+}
+
+int student_cmp_name_desc(const void *student1, const void *student2) {
+    student stud1 = *(student *) student1;
+    student stud2 = *(student *) student2;
+    int i = 0;
+    while (stud1.name[i] != '\0' || stud2.name[i] != '\0') {
+        if (stud2.name[i] > stud1.name[i]) {
+            return 1;
+        } else if (stud2.name[i] < stud1.name[i]) {
+            return -1;
+        }
+        i++;
+    }
+    return (stud2.age - stud1.age);//Если имя одинаковое, то сортирует по возрасту(по убыванию)
+}
 
 void my_memcopy(void *elem_past, void *elem_copy, size_t size) {
     int i;
@@ -67,6 +112,16 @@ int print_double_arr(double arr[], int start, int end) {
     int i = start;
     while (i < end) {
         printf("%lf ", arr[i]);
+        i++;
+    }
+    printf("\n");
+    return 0;
+}
+
+int print_student_arr(student arr[], int start, int end) {
+    int i = start;
+    while (i < end) {
+        printf("%s %d, ", arr[i].name, arr[i].age);//Не красивый вывод(в самом конце вывода будет стоя ть запятая)
         i++;
     }
     printf("\n");
@@ -170,6 +225,19 @@ int main() {
     }
     quick_sort(arr, n, sizeof(double), &double_cmp_asc);
     print_double_arr(arr, 0, n);
+    char arr_name1[50] = "Kostya";
+    int age1 = 19;
+    char arr_name2[50] = "Artem";
+    int age2 = 19;
+    char arr_name3[50] = "Grisha";
+    int age3 = 19;
+    student *array = malloc(3 * sizeof(student));
+    array[0] = create_stud(age1, arr_name1);
+    array[1] = create_stud(age2, arr_name2);
+    array[2] = create_stud(age3, arr_name3);
+    print_student_arr(array, 0, 3);
+    quick_sort(array, 3, sizeof(student), &student_cmp_name_asc);
+    print_student_arr(array, 0, 3);
     return 0;
 }
 
