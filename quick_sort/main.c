@@ -67,22 +67,15 @@ int student_cmp_name_asc(const void *student1, const void *student2) {
         }
         i++;
     }
-    return (stud1.age - stud2.age);//Если имя одинаковое, то сортирует по возрасту(по возрастанию)
+    if (stud1.name[i] == '\0' && stud2.name[i] == '\0') {
+        return (stud1.age - stud2.age);//Если имя одинаковое, то сортирует по возрасту(по возрастанию)
+    } else {
+        return (stud1.name[i]-stud2.name[i]);
+    }
 }
 
 int student_cmp_name_desc(const void *student1, const void *student2) {
-    student stud1 = *(student *) student1;
-    student stud2 = *(student *) student2;
-    int i = 0;
-    while (stud1.name[i] != '\0' || stud2.name[i] != '\0') {
-        if (stud2.name[i] > stud1.name[i]) {
-            return 1;
-        } else if (stud2.name[i] < stud1.name[i]) {
-            return -1;
-        }
-        i++;
-    }
-    return (stud2.age - stud1.age);//Если имя одинаковое, то сортирует по возрасту(по убыванию)
+    return student_cmp_name_asc(student2, student1);
 }
 
 void my_memcopy(void *elem_past, void *elem_copy, size_t size) {
