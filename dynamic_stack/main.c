@@ -27,7 +27,6 @@ void stack_destroy(Stack *pstack) {
 //Поменять size и capacity
 /* Поместить значение value на вершину стека */
 void stack_push(Stack *pstack, Pointer value) {
-    pstack->size++;
     if (pstack->size >= pstack->capacity) {
         pstack->start = realloc(pstack->start, pstack->capacity * 2);
         if (pstack->start == NULL) {
@@ -36,8 +35,9 @@ void stack_push(Stack *pstack, Pointer value) {
         }
         pstack->capacity *= 2;
     }
-    pstack->start[pstack->size] = value;
+    pstack->start[pstack->size++] = value;
 }
+
 
 /* Возвращает количество элементов в стеке (0, если стек пуст) */
 size_t stack_size(Stack *pstack) {
@@ -67,8 +67,8 @@ Pointer stack_pop(Stack *pstack) {
  */
 Pointer stack_peek(Stack *pstack) {
     if (pstack->size == 0) { return 0; }
-    Pointer res = *(pstack->start + pstack->capacity);
-    return (res);
+    Pointer res = *(pstack->start + (pstack->size - 1));
+    return res;
 };
 
 int test() {
@@ -77,13 +77,13 @@ int test() {
 
 int main() {
     test();
-    Stack* stack;
-    stack_create(stack);
+    Stack stack;
+    stack_create(&stack);
     int* primer = malloc(sizeof(int));
-    primer[0] = 1;
-    stack_push(stack, primer);
-    int a = *(stack_peek(stack));
-    //assert(primer[0]==a);
-    printf('%d, %d', primer[0], a);
+    *primer = 1;
+    stack_push(&stack, primer);
+    Pointer p = stack_peek(&stack);
+    printf("%d", *(int*)p == *primer);
     return 0;
 }
+
